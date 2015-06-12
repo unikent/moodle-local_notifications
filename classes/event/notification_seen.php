@@ -47,24 +47,6 @@ class notification_seen extends \core\event\base
      * @return string
      */
     public function get_description() {
-        return s($this->other['contextid']) . '/' . s($this->other['extref']) . ' notification seen by ' . $this->relateduserid . '.';
-    }
-
-    /**
-     * Custom validation.
-     *
-     * @throws \coding_exception
-     * @return void
-     */
-    protected function validate_data() {
-        parent::validate_data();
-
-        if (!isset($this->other['contextid'])) {
-            throw new \coding_exception('The \'contextid\' must be set.');
-        }
-
-        if (!isset($this->other['extref'])) {
-            throw new \coding_exception('The \'extref\' must be set.');
-        }
+        return s($this->objectid) . ' notification seen by ' . $this->relateduserid . '.';
     }
 }

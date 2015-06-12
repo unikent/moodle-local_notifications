@@ -27,7 +27,7 @@ $PAGE->set_title("Course Notifications");
 // Check form.
 $form = new \local_notifications\form\notify_form();
 if ($data = $form->get_data()) {
-    $actionable = isset($data->actionable) ? true : false;
+    $actionable = empty($data->actionable) ? 0 : $data->actionable;
     $dismissable = isset($data->dismissable) ? true : false;
 
     \local_notifications\Notification::create($data->courseid, 0, uniqid(), $data->message, $data->type, $actionable, $dismissable);

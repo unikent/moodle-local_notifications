@@ -39,6 +39,16 @@ if ($action == 'delete') {
     redirect($PAGE->url, 'Notification deleted', 2);
 }
 
+// Check form.
+$form = new \local_notifications\form\notify_form();
+if ($data = $form->get_data()) {
+    $actionable = empty($data->actionable) ? 0 : $data->actionable;
+    $dismissable = isset($data->dismissable) ? true : false;
+
+    \local_notifications\Notification::create($data->courseid, 0, uniqid(), $data->message, $data->type, $actionable, $dismissable);
+    redirect($PAGE->url, 'Notification created', 2);
+}
+
 $PAGE->requires->js_call_amd('local_notifications/filtering', 'init', array());
 
 $table = new \html_table();
@@ -110,6 +120,9 @@ echo \html_writer::table($table);
 
 $total = $DB->count_records('course_notifications', $notificationparams);
 echo $OUTPUT->paging_bar($total, $params['page'], $params['perpage'], $PAGE->url);
+
+// Add form.
+$form->display();
 
 // Output footer.
 echo $OUTPUT->footer();

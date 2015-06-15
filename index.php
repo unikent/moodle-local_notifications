@@ -25,13 +25,23 @@ require_capability('moodle/site:config', \context_system::instance());
 $params = array(
     'page'    => optional_param('page', 0, PARAM_INT),
     'perpage' => optional_param('perpage', 25, PARAM_INT),
-    'extref' => optional_param('extref', null, PARAM_RAW),
-    'courseid' => optional_param('courseid', null, PARAM_INT)
+    'extref' => optional_param('extref', '', PARAM_RAW),
+    'courseid' => optional_param('courseid', '', PARAM_INT)
 );
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new \moodle_url('/local/notifications/index.php', $params));
 $PAGE->set_title("Notifications Center");
+
+$action = optional_param('action', '', PARAM_RAW);
+if ($action == 'delete') {
+    require_sesskey();
+    $id = required_param('id', PARAM_INT);
+    $notification = \local_notifications\Notification::instance($id);
+    $notification->delete();
+    redirect($PAGE->url, 'Notification deleted', 2);
+}
+
 $PAGE->requires->js_call_amd('local_notifications/filtering', 'init', array());
 
 $table = new \html_table();
@@ -52,15 +62,26 @@ $courses = $DB->get_records('course', null, 'shortname');
 $notifications = $DB->get_recordset('course_notifications', $notificationparams, '', '*', $params['page'] * $params['perpage'], $params['perpage']);
 foreach ($notifications as $row) {
     $course = new \html_table_cell(\html_writer::tag('a', $courses[$row->courseid]->shortname, array(
-        'href' => $CFG->wwwroot . '/course/view.php?id=' . $row->courseid,
+        'href' => new \moodle_url('/course/view.php', array(
+            'id' => $row->courseid
+        )),
         'target' => '_blank'
+    )));
+
+    $actionurl = new \moodle_url('/local/notifications/index.php', array_merge($params, array(
+        'sesskey' => sesskey(),
+        'action' => 'delete',
+        'id' => $row->id
+    )));
+    $action = new \html_table_cell(\html_writer::tag('a', 'Delete', array(
+        'href' => $actionurl
     )));
 
     $table->data[] = array(
         $course,
         $row->extref,
         $row->message,
-        'todo'
+        $action
     );
 }
 

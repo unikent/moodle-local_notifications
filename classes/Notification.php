@@ -48,6 +48,17 @@ class Notification
 
         $data['id'] = $DB->insert_record('course_notifications', $data);
 
+        $event = \local_notifications\event\notification_created::create(array(
+            'objectid' => $data['id'],
+            'courseid' => $courseid,
+            'context' => \context_course::instance($courseid),
+            'other' => array(
+                'contextid' => $contextid,
+                'extref' => $extref
+            )
+        ));
+        $event->trigger();
+
         return new static($data);
     }
 
@@ -130,6 +141,13 @@ class Notification
             'nid' => $this->id,
             'userid' => $userid
         ));
+
+        $event = \local_notifications\event\notification_seen::create(array(
+            'objectid' => $this->id,
+            'context' => \context_user::instance($userid),
+            'relateduserid' => $userid
+        ));
+        $event->trigger();
     }
 
     /**
@@ -145,5 +163,16 @@ class Notification
         $DB->delete_records('course_notifications', array(
             'id' => $this->id
         ));
+
+        $event = \local_notifications\event\notification_deleted::create(array(
+            'objectid' => $this->id,
+            'courseid' => $this->courseid,
+            'context' => \context_course::instance($this->courseid),
+            'other' => array(
+                'contextid' => $this->contextid,
+                'extref' => $this->extref
+            )
+        ));
+        $event->trigger();
     }
 }

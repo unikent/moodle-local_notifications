@@ -19,9 +19,6 @@ require_once($CFG->libdir . '/adminlib.php');
 
 admin_externalpage_setup('notificationsmanager');
 
-require_login();
-require_capability('moodle/site:config', \context_system::instance());
-
 $params = array(
     'page'    => optional_param('page', 0, PARAM_INT),
     'perpage' => optional_param('perpage', 25, PARAM_INT),

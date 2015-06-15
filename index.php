@@ -22,7 +22,9 @@ require_capability('moodle/site:config', \context_system::instance());
 
 $params = array(
     'page'    => optional_param('page', 0, PARAM_INT),
-    'perpage' => optional_param('perpage', 25, PARAM_INT)
+    'perpage' => optional_param('perpage', 25, PARAM_INT),
+    'extref' => optional_param('extref', null, PARAM_RAW),
+    'courseid' => optional_param('courseid', null, PARAM_INT)
 );
 
 $PAGE->set_context(context_system::instance());
@@ -38,8 +40,15 @@ $table->data = array();
 $courses = $DB->get_records('course');
 $extrefs = $DB->get_fieldset_sql('SELECT DISTINCT extref FROM {course_notifications}');
 
-$notifications = $DB->get_recordset('course_notifications', null, '', '*', $params['page'] * $params['perpage'], $params['perpage']);
+$notificationparams = array();
+if (!empty($params['extref'])) {
+    $notificationparams['extref'] = $params['extref'];
+}
+if (!empty($params['courseid'])) {
+    $notificationparams['courseid'] = $params['courseid'];
+}
 
+$notifications = $DB->get_recordset('course_notifications', $notificationparams, '', '*', $params['page'] * $params['perpage'], $params['perpage']);
 foreach ($notifications as $row) {
     $course = new \html_table_cell(\html_writer::tag('a', $courses[$row->courseid]->shortname, array(
         'href' => $CFG->wwwroot . '/course/view.php?id=' . $row->courseid,
@@ -67,7 +76,7 @@ echo $OUTPUT->heading("Notifications Center");
 // Display notifications table.
 echo \html_writer::table($table);
 
-$total = $DB->count_records('course_notifications');
+$total = $DB->count_records('course_notifications', $notificationparams);
 echo $OUTPUT->paging_bar($total, $params['page'], $params['perpage'], $PAGE->url);
 
 // Output footer.

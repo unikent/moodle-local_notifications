@@ -37,9 +37,6 @@ $table->head = array(
 );
 $table->data = array();
 
-$courses = $DB->get_records('course');
-$extrefs = $DB->get_fieldset_sql('SELECT DISTINCT extref FROM {course_notifications}');
-
 $notificationparams = array();
 if (!empty($params['extref'])) {
     $notificationparams['extref'] = $params['extref'];
@@ -48,6 +45,7 @@ if (!empty($params['courseid'])) {
     $notificationparams['courseid'] = $params['courseid'];
 }
 
+$courses = $DB->get_records('course', null, 'shortname');
 $notifications = $DB->get_recordset('course_notifications', $notificationparams, '', '*', $params['page'] * $params['perpage'], $params['perpage']);
 foreach ($notifications as $row) {
     $course = new \html_table_cell(\html_writer::tag('a', $courses[$row->courseid]->shortname, array(
@@ -71,7 +69,20 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading("Notifications Center");
 
 // Display filtering options.
+$extrefs = $DB->get_fieldset_sql('SELECT DISTINCT extref FROM {course_notifications}');
+$prettyextrefs = array();
+foreach ($extrefs as $extref) {
+    $prettyextrefs[$extref] = $extref;
+}
+echo \html_writer::select($prettyextrefs, 'extref', $params['extref'], array('' => 'Filter by reference'));
 
+$prettycourses = array();
+foreach ($courses as $course) {
+    $prettycourses[$course->id] = $course->shortname . ': ' . $course->fullname;
+}
+echo \html_writer::select($prettycourses, 'course', $params['courseid'], array('' => 'Filter by course'));
+
+echo '<br />';
 
 // Display notifications table.
 echo \html_writer::table($table);

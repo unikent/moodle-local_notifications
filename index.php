@@ -32,6 +32,7 @@ $params = array(
 $PAGE->set_context(context_system::instance());
 $PAGE->set_url(new \moodle_url('/local/notifications/index.php', $params));
 $PAGE->set_title("Notifications Center");
+$PAGE->requires->js_call_amd('local_notifications/filtering', 'init', array());
 
 $table = new \html_table();
 $table->head = array(

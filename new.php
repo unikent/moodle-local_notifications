@@ -21,7 +21,7 @@ require_login();
 require_capability('moodle/site:config', \context_system::instance());
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url('/local/notifications/index.php');
+$PAGE->set_url('/local/notifications/new.php');
 $PAGE->set_title("Course Notifications");
 
 // Check form.

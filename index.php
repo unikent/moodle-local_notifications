@@ -17,6 +17,8 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
+admin_externalpage_setup('notificationsmanager');
+
 require_login();
 require_capability('moodle/site:config', \context_system::instance());
 

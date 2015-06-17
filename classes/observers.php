@@ -24,9 +24,9 @@ defined('MOODLE_INTERNAL') || die();
 class observers
 {
     /**
-     * course_content_deleted event.
+     * Clears notifications.
      */
-    public static function clear_notifications(\core\event\course_content_deleted $event) {
+    public static function clear_notifications(\core\event\base $event) {
         // Delete any notifications.
         $kc = new \local_kent\Course($event->objectid);
         $notifications = $kc->get_notifications();

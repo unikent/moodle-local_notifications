@@ -14,12 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+namespace local_notifications;
+
 defined('MOODLE_INTERNAL') || die();
 
-function xmldb_local_notifications_upgrade($oldversion) {
-    global $DB;
-
-    $dbman = $DB->get_manager();
-
-    return true;
+/**
+ * Observers
+ */
+class observers
+{
+    /**
+     * Clears notifications.
+     */
+    public static function clear_notifications(\core\event\base $event) {
+        // Delete any notifications.
+        $kc = new \local_kent\Course($event->objectid);
+        $notifications = $kc->get_notifications();
+        foreach ($notifications as $notification) {
+            $notification->delete();
+        }
+    }
 }

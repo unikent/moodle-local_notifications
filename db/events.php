@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Local stuff for Kent
+ * Local stuff
  *
  * @package    local_notifications
  * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>

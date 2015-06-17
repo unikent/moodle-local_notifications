@@ -20,4 +20,6 @@ function xmldb_local_notifications_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager();
+
+    return true;
 }

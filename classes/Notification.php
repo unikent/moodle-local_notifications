@@ -74,7 +74,7 @@ class Notification
 
         $obj = $DB->get_record('course_notifications', array(
             'id' => $objorid
-        ));
+        ), '*', \MUST_EXIST);
 
         if ($obj) {
             return new static($obj);

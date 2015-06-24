@@ -1,31 +1,25 @@
+
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/notifications/db" VERSION="20150611" COMMENT="XMLDB file for Moodle local/notifications"
+<XMLDB PATH="local/notifications/db" VERSION="20150624" COMMENT="XMLDB file for Moodle local/notifications"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="course_notifications" COMMENT="Course notifications">
+    <TABLE NAME="local_notifications" COMMENT="Notifications">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="classname" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="contextid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="extref" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="External reference"/>
-        <FIELD NAME="message" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="type" TYPE="char" LENGTH="18" NOTNULL="true" DEFAULT="warning" SEQUENCE="false"/>
-        <FIELD NAME="actionable" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="dismissable" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="objectid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="objecttable" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="k_cidctxextref" TYPE="unique" FIELDS="courseid, contextid, extref"/>
+        <KEY NAME="uniqnote" TYPE="unique" FIELDS="classname, contextid, objectid, objecttable"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="i_courseid" UNIQUE="false" FIELDS="courseid"/>
-        <INDEX NAME="i_course_actionable" UNIQUE="false" FIELDS="courseid, actionable"/>
-        <INDEX NAME="i_courseid_type" UNIQUE="false" FIELDS="courseid, type"/>
-      </INDEXES>
     </TABLE>
-    <TABLE NAME="course_notifications_seen" COMMENT="Seen course notifications">
+    <TABLE NAME="local_notifications_seen" COMMENT="Seen notifications">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="nid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false" COMMENT="notification id"/>

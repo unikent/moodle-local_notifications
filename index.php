@@ -22,8 +22,8 @@ admin_externalpage_setup('notificationsmanager');
 $params = array(
     'page'    => optional_param('page', 0, PARAM_INT),
     'perpage' => optional_param('perpage', 25, PARAM_INT),
-    'extref' => optional_param('extref', '', PARAM_RAW),
-    'courseid' => optional_param('courseid', '', PARAM_INT)
+    'classname' => optional_param('classname', '', PARAM_RAW),
+    'objectid' => optional_param('objectid', '', PARAM_INT)
 );
 
 $PAGE->set_context(context_system::instance());
@@ -34,43 +34,37 @@ $action = optional_param('action', '', PARAM_RAW);
 if ($action == 'delete') {
     require_sesskey();
     $id = required_param('id', PARAM_INT);
-    $notification = \local_notifications\Notification::instance($id);
+    $notification = \local_notifications\core::get_notification($id);
     $notification->delete();
     redirect($PAGE->url, 'Notification deleted', 2);
-}
-
-// Check form.
-$form = new \local_notifications\form\notify_form();
-if ($data = $form->get_data()) {
-    $actionable = empty($data->actionable) ? 0 : $data->actionable;
-    $dismissable = isset($data->dismissable) ? true : false;
-
-    \local_notifications\Notification::create($data->courseid, 0, uniqid(), $data->message, $data->type, $actionable, $dismissable);
-    redirect($PAGE->url, 'Notification created', 2);
 }
 
 $PAGE->requires->js_call_amd('local_notifications/filtering', 'init', array());
 
 $table = new \html_table();
 $table->head = array(
-    'Course', 'Reference', 'Message', 'Action'
+    'Course', 'Classname', 'Message', 'Action'
 );
 $table->data = array();
 
-$notificationparams = array();
-if (!empty($params['extref'])) {
-    $notificationparams['extref'] = $params['extref'];
+$notificationparams = array(
+    'objecttable' => 'course'
+);
+
+if (!empty($params['classname'])) {
+    $notificationparams['classname'] = $params['classname'];
 }
-if (!empty($params['courseid'])) {
-    $notificationparams['courseid'] = $params['courseid'];
+
+if (!empty($params['objectid'])) {
+    $notificationparams['objectid'] = $params['objectid'];
 }
 
 $courses = $DB->get_records('course', null, 'shortname');
-$notifications = $DB->get_recordset('course_notifications', $notificationparams, '', '*', $params['page'] * $params['perpage'], $params['perpage']);
+$notifications = $DB->get_recordset('local_notifications', $notificationparams, '', '*', $params['page'] * $params['perpage'], $params['perpage']);
 foreach ($notifications as $row) {
-    $course = new \html_table_cell(\html_writer::tag('a', $courses[$row->courseid]->shortname, array(
+    $course = new \html_table_cell(\html_writer::tag('a', $courses[$row->objectid]->shortname, array(
         'href' => new \moodle_url('/course/view.php', array(
-            'id' => $row->courseid
+            'id' => $row->objectid
         )),
         'target' => '_blank'
     )));
@@ -86,8 +80,8 @@ foreach ($notifications as $row) {
 
     $table->data[] = array(
         $course,
-        $row->extref,
-        $row->message,
+        $row->classname,
+        $row->data,
         $action
     );
 }
@@ -100,25 +94,25 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading("Notifications Center");
 
 // Display filtering options.
-$extrefs = $DB->get_fieldset_sql('SELECT DISTINCT extref FROM {course_notifications}');
+$extrefs = $DB->get_fieldset_sql('SELECT DISTINCT classname FROM {local_notifications}');
 $prettyextrefs = array();
-foreach ($extrefs as $extref) {
-    $prettyextrefs[$extref] = $extref;
+foreach ($extrefs as $classname) {
+    $prettyextrefs[$classname] = $classname;
 }
-echo \html_writer::select($prettyextrefs, 'extref', $params['extref'], array('' => 'Filter by reference'));
+echo \html_writer::select($prettyextrefs, 'classname', $params['classname'], array('' => 'Filter by classname'));
 
 $prettycourses = array();
 foreach ($courses as $course) {
     $prettycourses[$course->id] = $course->shortname . ': ' . $course->fullname;
 }
-echo \html_writer::select($prettycourses, 'course', $params['courseid'], array('' => 'Filter by course'));
+echo \html_writer::select($prettycourses, 'course', $params['objectid'], array('' => 'Filter by course'));
 
 echo '<br />';
 
 // Display notifications table.
 echo \html_writer::table($table);
 
-$total = $DB->count_records('course_notifications', $notificationparams);
+$total = $DB->count_records('local_notifications', $notificationparams);
 echo $OUTPUT->paging_bar($total, $params['page'], $params['perpage'], $PAGE->url);
 
 // Add form.

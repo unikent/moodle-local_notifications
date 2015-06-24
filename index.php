@@ -43,7 +43,7 @@ $PAGE->requires->js_call_amd('local_notifications/filtering', 'init', array());
 
 $table = new \html_table();
 $table->head = array(
-    'Course', 'Classname', 'Message', 'Action'
+    'Course', 'Classname', 'Data', 'Action'
 );
 $table->data = array();
 

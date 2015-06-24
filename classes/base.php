@@ -28,10 +28,10 @@ abstract class base
     const LEVEL_WARNING = 'alert-warning';
     const LEVEL_DANGER = 'alert-danger';
 
-    private $_id;
-    private $_objectid;
-    private $_context;
-    private $_data;
+    protected $id;
+    protected $objectid;
+    protected $context;
+    protected $other;
 
     /**
      * Creates an instance of the notification.
@@ -48,11 +48,11 @@ abstract class base
         }
 
         if (isset($data['id'])) {
-            $obj->_id = $data['id'];
+            $obj->id = $data['id'];
         }
 
-        $obj->_objectid = $data['objectid'];
-        $obj->_context = $data['context'];
+        $obj->objectid = $data['objectid'];
+        $obj->context = $data['context'];
 
         if (isset($data['other'])) {
             $obj->set_custom_data($data['other']);
@@ -62,18 +62,29 @@ abstract class base
     }
 
     /**
+     * Returns the related object.
+     */
+    public function get_object() {
+        global $DB;
+
+        return $DB->get_record($this->get_table(), array(
+            'id' => $this->objectid
+        ));
+    }
+
+    /**
      * Returns the context.
      */
     public function get_context() {
-        if (empty($this->_context)) {
+        if (empty($this->context)) {
             return null;
         }
 
-        if (!is_object($this->_context)) {
-            $this->_context = \context::instance_by_id($this->_context);
+        if (!is_object($this->context)) {
+            $this->context = \context::instance_by_id($this->context);
         }
 
-        return $this->_context;
+        return $this->context;
     }
 
     /**
@@ -82,17 +93,17 @@ abstract class base
     private function get_event_data() {
         // Create the event.
         $event = array(
-            'objectid' => $this->_id,
+            'objectid' => $this->id,
             'context' => $this->get_context()
         );
 
         $table = $this->get_table();
         if ($table == 'course') {
-            $event['courseid'] = $this->_objectid;
+            $event['courseid'] = $this->objectid;
         }
 
         if ($table == 'user') {
-            $event['relateduserid'] = $this->_objectid;
+            $event['relateduserid'] = $this->objectid;
         }
 
         return $event;
@@ -109,11 +120,11 @@ abstract class base
         $record = new \stdClass();
         $record->classname = static::class;
         $record->contextid = $context->id;
-        $record->objectid = $this->_objectid;
+        $record->objectid = $this->objectid;
         $record->objecttable = $this->get_table();
-        $record->data = serialize((object)$this->_data);
+        $record->data = serialize((object)$this->other);
 
-        $this->_id = $DB->insert_record('local_notifications', $record);
+        $this->id = $DB->insert_record('local_notifications', $record);
 
         // Create the event.
         $event = \local_notifications\event\notification_created::create($this->get_event_data());
@@ -126,12 +137,12 @@ abstract class base
     public function delete() {
         global $DB;
 
-        if (!isset($this->_id)) {
+        if (!isset($this->id)) {
             throw new \coding_exception("Cannot delete a notification without an ID.");
         }
 
         $DB->update_record('local_notifications', array(
-            'id' => $this->_id,
+            'id' => $this->id,
             'deleted' => 1
         ));
 
@@ -145,14 +156,14 @@ abstract class base
     public function mark_seen($userid = null) {
         global $DB, $USER;
 
-        if (!isset($this->_id)) {
+        if (!isset($this->id)) {
             throw new \coding_exception("Cannot mark a notification without an ID.");
         }
 
         $userid = $userid ? $userid : $USER->id;
 
         $DB->insert_record('local_notifications_seen', array(
-            'nid' => $this->_id,
+            'nid' => $this->id,
             'userid' => $userid
         ));
 
@@ -182,7 +193,7 @@ abstract class base
      * Checks custom data.
      */
     public function set_custom_data($data) {
-        $this->_data['other'] = (array)$data;
+        $this->other = (array)$data;
     }
 
     /**

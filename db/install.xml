@@ -1,4 +1,3 @@
-
 <?xml version="1.0" encoding="UTF-8" ?>
 <XMLDB PATH="local/notifications/db" VERSION="20150624" COMMENT="XMLDB file for Moodle local/notifications"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -13,10 +12,11 @@
         <FIELD NAME="objectid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="objecttable" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="data" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="deleted" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="uniqnote" TYPE="unique" FIELDS="classname, contextid, objectid, objecttable"/>
+        <KEY NAME="uniqnote" TYPE="unique" FIELDS="classname, contextid, objectid, objecttable, deleted"/>
       </KEYS>
     </TABLE>
     <TABLE NAME="local_notifications_seen" COMMENT="Seen notifications">

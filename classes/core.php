@@ -36,7 +36,7 @@ class core
         }
 
         $classname = $notification->classname;
-        $record->context = \context::instance_by_id($notification->contextid);
+        $notification->context = \context::instance_by_id($notification->contextid);
 
         return $classname::instance((array)$notification);
     }

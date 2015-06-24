@@ -105,5 +105,32 @@ function xmldb_local_notifications_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015062400, 'local', 'notifications');
     }
 
+    if ($oldversion < 2015062401) {
+        $table = new xmldb_table('local_notifications');
+
+        // Define field deleted to be added to local_notifications.
+        $field = new xmldb_field('deleted', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', 'data');
+
+        // Conditionally launch add field deleted.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define key uniqnote (unique) to be dropped form local_notifications.
+        $key = new xmldb_key('uniqnote', XMLDB_KEY_UNIQUE, array('classname', 'contextid', 'objectid', 'objecttable'));
+
+        // Launch drop key uniqnote.
+        $dbman->drop_key($table, $key);
+
+        // Define key uniqnote (unique) to be added to local_notifications.
+        $key = new xmldb_key('uniqnote', XMLDB_KEY_UNIQUE, array('classname', 'contextid', 'objectid', 'objecttable', 'deleted'));
+
+        // Launch add key uniqnote.
+        $dbman->add_key($table, $key);
+
+        // Notifications savepoint reached.
+        upgrade_plugin_savepoint(true, 2015062401, 'local', 'notifications');
+    }
+
     return true;
 }

@@ -28,6 +28,7 @@ abstract class base
     const LEVEL_WARNING = 'alert-warning';
     const LEVEL_DANGER = 'alert-danger';
 
+    private $_id;
     private $_objectid;
     private $_context;
     private $_data;
@@ -44,6 +45,10 @@ abstract class base
 
         if (!isset($data['context'])) {
             throw new \coding_exception("You must set a context.");
+        }
+
+        if (isset($data['id'])) {
+            $obj->_id = $data['id'];
         }
 
         $obj->_objectid = $data['objectid'];
@@ -64,11 +69,33 @@ abstract class base
             return null;
         }
 
-        if (is_object($this->_context)) {
-            return $this->_context;
+        if (!is_object($this->_context)) {
+            $this->_context = \context::instance_by_id($this->_context);
         }
 
-         return \context::instance_by_id($this->_context);
+        return $this->_context;
+    }
+
+    /**
+     * Returns event data.
+     */
+    private function get_event_data() {
+        // Create the event.
+        $event = array(
+            'objectid' => $this->_id,
+            'context' => $this->get_context()
+        );
+
+        $table = $this->get_table();
+        if ($table == 'course') {
+            $event['courseid'] = $this->_objectid;
+        }
+
+        if ($table == 'user') {
+            $event['relateduserid'] = $this->_objectid;
+        }
+
+        return $event;
     }
 
     /**
@@ -86,7 +113,57 @@ abstract class base
         $record->objecttable = $this->get_table();
         $record->data = serialize((object)$this->_data);
 
-        $DB->insert_record('local_notifications', $record);
+        $this->_id = $DB->insert_record('local_notifications', $record);
+
+        // Create the event.
+        $event = \local_notifications\event\notification_created::create($this->get_event_data());
+        $event->trigger();
+    }
+
+    /**
+     * Delete the notification.
+     */
+    public function delete() {
+        global $DB;
+
+        if (!isset($this->_id)) {
+            throw new \coding_exception("Cannot delete a notification without an ID.");
+        }
+
+        $record = $DB->get_record('local_notifications', array(
+            'id' => $this->_id
+        ), '*', \MUST_EXIST);
+        $record->deleted = 1;
+
+        $DB->update_record('local_notifications', $record);
+
+        $event = \local_notifications\event\notification_deleted::create($this->get_event_data());
+        $event->trigger();
+    }
+
+    /**
+     * Mark this as seen.
+     */
+    public function mark_seen($userid = null) {
+        global $DB, $USER;
+
+        if (!isset($this->_id)) {
+            throw new \coding_exception("Cannot mark a notification without an ID.");
+        }
+
+        $userid = $userid ? $userid : $USER->id;
+
+        $DB->insert_record('local_notifications_seen', array(
+            'nid' => $this->_id,
+            'userid' => $userid
+        ));
+
+        $event = \local_notifications\event\notification_seen::create(array(
+            'objectid' => $this->id,
+            'context' => \context_user::instance($userid),
+            'relateduserid' => $userid
+        ));
+        $event->trigger();
     }
 
     /**

@@ -27,7 +27,7 @@ class notification_deleted extends \core\event\base
      * Init method.
      */
     protected function init() {
-        $this->data['objecttable'] = 'course_notifications';
+        $this->data['objecttable'] = 'local_notifications';
         $this->data['crud'] = 'd';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }
@@ -47,24 +47,6 @@ class notification_deleted extends \core\event\base
      * @return string
      */
     public function get_description() {
-        return s($this->other['contextid']) . '/' . s($this->other['extref']) . ' notification deleted.';
-    }
-
-    /**
-     * Custom validation.
-     *
-     * @throws \coding_exception
-     * @return void
-     */
-    protected function validate_data() {
-        parent::validate_data();
-
-        if (!isset($this->other['contextid'])) {
-            throw new \coding_exception('The \'contextid\' must be set.');
-        }
-
-        if (!isset($this->other['extref'])) {
-            throw new \coding_exception('The \'extref\' must be set.');
-        }
+        return $this->objectid . ' notification deleted.';
     }
 }

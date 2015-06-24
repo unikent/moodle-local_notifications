@@ -130,12 +130,10 @@ abstract class base
             throw new \coding_exception("Cannot delete a notification without an ID.");
         }
 
-        $record = $DB->get_record('local_notifications', array(
-            'id' => $this->_id
-        ), '*', \MUST_EXIST);
-        $record->deleted = 1;
-
-        $DB->update_record('local_notifications', $record);
+        $DB->update_record('local_notifications', array(
+            'id' => $this->_id,
+            'deleted' => 1
+        ));
 
         $event = \local_notifications\event\notification_deleted::create($this->get_event_data());
         $event->trigger();

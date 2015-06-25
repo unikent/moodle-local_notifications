@@ -40,7 +40,7 @@ abstract class base
         $obj = new static();
         $obj->id = $data->id;
         $obj->objectid = $data->objectid;
-        $obj->context = $data->context;
+        $obj->context = $data->contextid;
         $obj->other = unserialize($data->data);
 
         return $obj;
@@ -72,6 +72,8 @@ abstract class base
     public final static function create($data, $update = true) {
         global $DB;
 
+        $data = (object)$data;
+
         if (!isset($data->objectid)) {
             throw new \coding_exception("You must set an objectid.");
         }
@@ -81,8 +83,8 @@ abstract class base
         }
 
         $obj = new static();
-        if (isset($data['other'])) {
-            $obj->set_custom_data($data['other']);
+        if (isset($data->other)) {
+            $obj->set_custom_data($data->other);
         }
 
         $record = new \stdClass();
@@ -92,19 +94,19 @@ abstract class base
         $record->objecttable = static::get_table();
 
         // Check for existing record.
-        $existing = $DB->get_record('local_notifications', $record);
+        $existing = $DB->get_record('local_notifications', (array)$record);
 
         $record->data = serialize($obj->other);
 
         // Update existing record.
         if ($existing) {
             $existing->data = $record->data;
-            $DB->update_record('local_notifications', $existing);
+            $DB->update_record('local_notifications', (array)$existing);
             return $existing;
         }
 
         // Create a new record.
-        $record->id = $DB->insert_record('local_notifications', $record);
+        $record->id = $DB->insert_record('local_notifications', (array)$record);
 
         // Create the event.
         $obj = static::instance($record);
@@ -275,12 +277,16 @@ abstract class base
     /**
      * Returns the component of the notification.
      */
-    public abstract static function get_component();
+    public static function get_component() {
+        throw new \coding_exception("Invalid notification: get_component not implemented.");
+    }
 
     /**
      * Returns the table name the objectid relates to.
      */
-    public abstract static function get_table();
+    public static function get_table() {
+        throw new \coding_exception("Invalid notification: get_table not implemented.");
+    }
 
     /**
      * Returns the level of the notification.

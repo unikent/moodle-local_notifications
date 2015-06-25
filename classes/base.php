@@ -49,7 +49,7 @@ abstract class base
     /**
      * Save the notification to DB.
      */
-    public final static function create($data) {
+    public final static function create($data, $update = true) {
         global $DB;
 
         if (!isset($data->objectid)) {
@@ -74,14 +74,28 @@ abstract class base
         $record->contextid = $data->context->id;
         $record->objectid = $data->objectid;
         $record->objecttable = $data->objecttable;
+
+        // Check for existing record.
+        $existing = $DB->get_record('local_notifications', $record);
+
         $record->data = serialize($obj->other);
 
+        // Update existing record.
+        if ($existing) {
+            $existing->data = $record->data;
+            $DB->update_record('local_notifications', $existing);
+            return $existing;
+        }
+
+        // Create a new record.
         $record->id = $DB->insert_record('local_notifications', $record);
 
         // Create the event.
         $obj = static::instance($record);
         $event = \local_notifications\event\notification_created::create($obj->get_event_data());
         $event->trigger();
+
+        return $obj;
     }
 
     /**
@@ -198,6 +212,25 @@ abstract class base
     }
 
     /**
+     * Returns the icon of the notification.
+     */
+    public function get_icon() {
+        switch ($this->get_level()) {
+            case self::LEVEL_SUCCESS:
+            return 'fa-check';
+
+            case self::LEVEL_INFO:
+            return 'fa-info-circle';
+
+            case self::LEVEL_WARNING:
+            return 'fa-exclamation-triangle';
+
+            case self::LEVEL_DANGER:
+            return 'fa-times-circle';
+        }
+    }
+
+    /**
      * Returns the component of the notification.
      */
     public abstract function get_component();
@@ -211,11 +244,6 @@ abstract class base
      * Returns the level of the notification.
      */
     public abstract function get_level();
-
-    /**
-     * Returns the icon of the notification.
-     */
-    public abstract function get_icon();
 
     /**
      * Returns the notification.

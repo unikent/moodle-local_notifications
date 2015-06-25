@@ -42,6 +42,9 @@ function xmldb_local_notifications_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
+        // Clear out course_notifications_seen.
+        $DB->delete_records('course_notifications_seen');
+
         // Define table course_notifications_seen to be renamed to local_notifications_seen.
         $table = new xmldb_table('course_notifications_seen');
 

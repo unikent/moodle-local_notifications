@@ -17,7 +17,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 function xmldb_local_notifications_upgrade($oldversion) {
-    global $DB;
+    global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 

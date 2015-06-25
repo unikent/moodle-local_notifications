@@ -35,7 +35,7 @@ class core
             ));
         }
 
-        $classname = $notification->classname;
+        $classname = "\\" . $notification->classname;
         $notification->context = \context::instance_by_id($notification->contextid);
 
         if (!class_exists($classname)) {
@@ -43,7 +43,7 @@ class core
             return null;
         }
 
-        return $classname::instance((array)$notification);
+        return $classname::instance($notification);
     }
 
     /**

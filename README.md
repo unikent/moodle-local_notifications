@@ -8,14 +8,14 @@ class example_notification extends \local_notifications\notification\base {
     /**
      * Returns the component of the notification.
      */
-    public function get_component() {
+    public static function get_component() {
         return 'local_notifications';
     }
 
     /**
      * Returns the table name the objectid relates to.
      */
-    public function get_table() {
+    public static function get_table() {
         return 'course';
     }
 

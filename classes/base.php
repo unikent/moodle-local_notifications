@@ -38,27 +38,50 @@ abstract class base
      */
     public final static function instance($data) {
         $obj = new static();
+        $obj->id = $data->id;
+        $obj->objectid = $data->objectid;
+        $obj->context = $data->context;
+        $obj->other = unserialize($data->data);
 
-        if (!isset($data['objectid'])) {
+        return $obj;
+    }
+
+    /**
+     * Save the notification to DB.
+     */
+    public final static function create($data) {
+        global $DB;
+
+        if (!isset($data->objectid)) {
             throw new \coding_exception("You must set an objectid.");
         }
 
-        if (!isset($data['context'])) {
+        if (!isset($data->objecttable)) {
+            throw new \coding_exception("You must set an objecttable.");
+        }
+
+        if (!isset($data->context) || !is_object($data->context)) {
             throw new \coding_exception("You must set a context.");
         }
 
-        if (isset($data['id'])) {
-            $obj->id = $data['id'];
-        }
-
-        $obj->objectid = $data['objectid'];
-        $obj->context = $data['context'];
-
+        $obj = new static();
         if (isset($data['other'])) {
             $obj->set_custom_data($data['other']);
         }
 
-        return $obj;
+        $record = new \stdClass();
+        $record->classname = static::class;
+        $record->contextid = $data->context->id;
+        $record->objectid = $data->objectid;
+        $record->objecttable = $data->objecttable;
+        $record->data = serialize($obj->other);
+
+        $record->id = $DB->insert_record('local_notifications', $record);
+
+        // Create the event.
+        $obj = static::instance($record);
+        $event = \local_notifications\event\notification_created::create($obj->get_event_data());
+        $event->trigger();
     }
 
     /**
@@ -107,28 +130,6 @@ abstract class base
         }
 
         return $event;
-    }
-
-    /**
-     * Save the notification to DB.
-     */
-    public function save() {
-        global $DB;
-
-        $context = $this->get_context();
-
-        $record = new \stdClass();
-        $record->classname = static::class;
-        $record->contextid = $context->id;
-        $record->objectid = $this->objectid;
-        $record->objecttable = $this->get_table();
-        $record->data = serialize((object)$this->other);
-
-        $this->id = $DB->insert_record('local_notifications', $record);
-
-        // Create the event.
-        $event = \local_notifications\event\notification_created::create($this->get_event_data());
-        $event->trigger();
     }
 
     /**

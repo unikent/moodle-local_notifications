@@ -47,6 +47,26 @@ abstract class base
     }
 
     /**
+     * Get a copy of this notification.
+     */
+    public final static function get($objectid, $context) {
+        global $DB;
+
+        $obj = $DB->get_record('local_notifications', array(
+            'classname' => static::class,
+            'objectid' => $objectid,
+            'objecttable' => static::get_table(),
+            'contextid' => $context->id
+        ));
+
+        if (!$obj) {
+            return null;
+        }
+
+        return static::instance($obj);
+    }
+
+    /**
      * Save the notification to DB.
      */
     public final static function create($data, $update = true) {
@@ -54,10 +74,6 @@ abstract class base
 
         if (!isset($data->objectid)) {
             throw new \coding_exception("You must set an objectid.");
-        }
-
-        if (!isset($data->objecttable)) {
-            throw new \coding_exception("You must set an objecttable.");
         }
 
         if (!isset($data->context) || !is_object($data->context)) {
@@ -73,7 +89,7 @@ abstract class base
         $record->classname = static::class;
         $record->contextid = $data->context->id;
         $record->objectid = $data->objectid;
-        $record->objecttable = $data->objecttable;
+        $record->objecttable = static::get_table();
 
         // Check for existing record.
         $existing = $DB->get_record('local_notifications', $record);
@@ -130,7 +146,7 @@ abstract class base
     public function get_object() {
         global $DB;
 
-        return $DB->get_record($this->get_table(), array(
+        return $DB->get_record(static::get_table(), array(
             'id' => $this->objectid
         ));
     }
@@ -160,7 +176,7 @@ abstract class base
             'context' => $this->get_context()
         );
 
-        $table = $this->get_table();
+        $table = static::get_table();
         if ($table == 'course') {
             $event['courseid'] = $this->objectid;
         }
@@ -259,12 +275,12 @@ abstract class base
     /**
      * Returns the component of the notification.
      */
-    public abstract function get_component();
+    public abstract static function get_component();
 
     /**
      * Returns the table name the objectid relates to.
      */
-    public abstract function get_table();
+    public abstract static function get_table();
 
     /**
      * Returns the level of the notification.

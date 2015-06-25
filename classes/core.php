@@ -38,6 +38,11 @@ class core
         $classname = $notification->classname;
         $notification->context = \context::instance_by_id($notification->contextid);
 
+        if (!class_exists($classname)) {
+            debugging("$classname does not exist.");
+            return null;
+        }
+
         return $classname::instance((array)$notification);
     }
 
@@ -54,7 +59,15 @@ class core
             'objecttable' => 'course'
         ));
 
-        return array_map(array('\\local_notifications\\core', 'get_notification'), $records);
+        $notifications = array();
+        foreach ($records as $record) {
+            $notification = static::get_notification($record);
+            if ($notification) {
+                $notifications[] = $notification;
+            }
+        }
+
+        return $notifications;
     }
 
     /**

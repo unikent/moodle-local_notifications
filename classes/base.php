@@ -99,6 +99,32 @@ abstract class base
     }
 
     /**
+     * Is this notification visible for the current user?
+     */
+    public function is_visible($userid = null) {
+        global $DB, $USER;
+
+        $userid = empty($userid) ? $USER->id : $userid;
+
+        if (!$this->is_dismissble()) {
+            return true;
+        }
+
+        // Check!
+        return !$DB->record_exists('local_notifications_seen', array(
+            'nid' => $this->id,
+            'userid' => $userid
+        ));
+    }
+
+    /**
+     * Returns the id.
+     */
+    public function get_id() {
+        return $this->id;
+    }
+
+    /**
      * Returns the related object.
      */
     public function get_object() {

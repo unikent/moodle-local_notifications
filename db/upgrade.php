@@ -101,7 +101,7 @@ function xmldb_local_notifications_upgrade($oldversion) {
         }
 
         // Cla savepoint reached.
-        upgrade_mod_savepoint(true, 2015062501, 'local', 'notifications');
+        upgrade_plugin_savepoint(true, 2015062501, 'local', 'notifications');
     }
 
     if ($oldversion < 2015062502) {

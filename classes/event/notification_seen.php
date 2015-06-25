@@ -27,7 +27,7 @@ class notification_seen extends \core\event\base
      * Init method.
      */
     protected function init() {
-        $this->data['objecttable'] = 'course_notifications';
+        $this->data['objecttable'] = 'local_notifications';
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_OTHER;
     }

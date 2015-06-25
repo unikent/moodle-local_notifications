@@ -28,8 +28,7 @@ class observers
      */
     public static function clear_notifications(\core\event\base $event) {
         // Delete any notifications.
-        $kc = new \local_kent\Course($event->objectid);
-        $notifications = $kc->get_notifications();
+        $notifications = core::get_notifications($event->objectid);
         foreach ($notifications as $notification) {
             $notification->delete();
         }

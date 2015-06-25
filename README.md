@@ -4,7 +4,7 @@ Moodle notifications plugin
 Example notification
 
 ```
-class example_notification extends \local_notifications\base {
+class example_notification extends \local_notifications\notification\base {
     /**
      * Returns the component of the notification.
      */
@@ -23,7 +23,7 @@ class example_notification extends \local_notifications\base {
      * Returns the level of the notification.
      */
     public function get_level() {
-        return \local_notifications\base::LEVEL_INFO;
+        return \local_notifications\notification\base::LEVEL_INFO;
     }
 
     /**

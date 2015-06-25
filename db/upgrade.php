@@ -63,7 +63,7 @@ function xmldb_local_notifications_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015062400, 'local', 'notifications');
     }
 
-    if ($oldversion < 2015062401) {
+    if ($oldversion < 2015062500) {
         $table = new xmldb_table('local_notifications');
 
         // Define field deleted to be added to local_notifications.
@@ -87,7 +87,97 @@ function xmldb_local_notifications_upgrade($oldversion) {
         $dbman->add_key($table, $key);
 
         // Notifications savepoint reached.
-        upgrade_plugin_savepoint(true, 2015062401, 'local', 'notifications');
+        upgrade_plugin_savepoint(true, 2015062500, 'local', 'notifications');
+    }
+
+    // Upgrade notifications.
+    if ($oldversion < 2015062501) {
+        require_once($CFG->dirroot . "/mod/cla/lib.php");
+
+        // Get a list of courses with a CLA notification.
+        $courses = $DB->get_records_sql('SELECT course as id FROM {cla} WHERE rolled_over_inactive=2 AND deleted=0 GROUP BY course');
+        foreach ($courses as $course) {
+            cla_generate_course_notification($course->id);
+        }
+
+        // Cla savepoint reached.
+        upgrade_mod_savepoint(true, 2015062501, 'local', 'notifications');
+    }
+
+    if ($oldversion < 2015062502) {
+        $expirations = $DB->get_records('catman_expirations');
+        foreach ($expirations as $expiration) {
+            $context = \context_course::instance($expiration->courseid);
+
+            \local_catman\notification\scheduled::create(array(
+                'objectid' => $expiration->courseid,
+                'context' => $context,
+                'other' => array(
+                    'expirationtime' => $expiration->expiration_time
+                )
+            ));
+        }
+
+        upgrade_plugin_savepoint(true, 2015062502, 'local', 'notifications');
+    }
+
+    // Upgrade notifications.
+    if ($oldversion < 2015062503) {
+        $contextpreload = \context_helper::get_preload_record_columns_sql('x');
+        $courses = $DB->get_records_sql("SELECT c.id, c.shortname, $contextpreload
+            FROM {course} c
+            INNER JOIN {context} x ON (c.id=x.instanceid AND x.contextlevel=".CONTEXT_COURSE.")
+        ");
+        foreach ($courses as $course) {
+            \context_helper::preload_from_record($course);
+            $context = \context_course::instance($course->id);
+
+            if (strpos($course->shortname, 'DX') === 0) {
+                \local_kent\notification\classify::create(array(
+                    'objectid' => $course->id,
+                    'context' => $context
+                ));
+            }
+
+            // Regenerate the deprecated notification.
+            $task = new \local_kent\task\generate_deprecated_notification();
+            $task->set_custom_data(array(
+                'courseid' => $course->id
+            ));
+            \core\task\manager::queue_adhoc_task($task);
+        }
+
+        // Kent savepoint reached.
+        upgrade_plugin_savepoint(true, 2015062503, 'local', 'notifications');
+    }
+
+    if ($oldversion < 2015062504) {
+        // Upgrade previous notifications.
+        $courses = $DB->get_records('course');
+        foreach ($courses as $course) {
+            $context = \context_course::instance($course->id);
+
+            $kr = new \local_rollover\Course($course);
+            if ($kr->get_status() !== \local_rollover\Rollover::STATUS_NONE) {
+                $record = $kr->get_rollover();
+
+                $kc = new \local_kent\Course($course->id);
+
+                // Generate a status notification.
+                \local_rollover\notification\status::create(array(
+                    'objectid' => $course->id,
+                    'context' => $context,
+                    'other' => array(
+                        'complete' => true,
+                        'rolloverid' => $record->id,
+                        'record' => $record,
+                        'manual' => $kc->is_manual()
+                    )
+                ));
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2015062504, 'local', 'notifications');
     }
 
     return true;

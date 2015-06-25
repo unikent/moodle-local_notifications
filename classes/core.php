@@ -56,7 +56,8 @@ class core
 
         $records = $DB->get_records('local_notifications', array(
             'objectid' => $courseid,
-            'objecttable' => 'course'
+            'objecttable' => 'course',
+            'deleted' => 0
         ));
 
         $notifications = array();
@@ -80,7 +81,8 @@ class core
 
         return $DB->count_records('local_notifications', array(
             'objectid' => $courseid,
-            'objecttable' => 'course'
+            'objecttable' => 'course',
+            'deleted' => 0
         ));
     }
 

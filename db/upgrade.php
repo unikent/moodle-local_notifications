@@ -105,7 +105,7 @@ function xmldb_local_notifications_upgrade($oldversion) {
     }
 
     if ($oldversion < 2015062502) {
-        $expirations = $DB->get_records('catman_expirations');
+        $expirations = $DB->get_records('catman_expirations', array('status' => 0));
         foreach ($expirations as $expiration) {
             $context = \context_course::instance($expiration->courseid);
 

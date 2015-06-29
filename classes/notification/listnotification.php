@@ -73,4 +73,33 @@ abstract class listnotification extends base
     public function get_actions() {
         return count($this->get_items());
     }
+
+    /**
+     * Returns the notification.
+     */
+    public function render() {
+        $items = array();
+        foreach ($this->get_items() as $item) {
+            $items[] = $this->render_item($item);
+        }
+        return \html_writer::alist($items, array(
+            'class' => 'list'
+        ));
+    }
+
+    /**
+     * Returns a rendered item.
+     */
+    public abstract function render_item($item);
+
+    /**
+     * Checks custom data.
+     */
+    public function set_custom_data($data) {
+        if (empty($data['items'])) {
+            debugging('You have not set any items.');
+        }
+
+        parent::set_custom_data($data);
+    }
 }

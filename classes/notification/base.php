@@ -102,7 +102,7 @@ abstract class base
         if ($existing) {
             $existing->data = $record->data;
             $DB->update_record('local_notifications', (array)$existing);
-            return $existing;
+            return static::instance($existing);
         }
 
         // Create a new record.

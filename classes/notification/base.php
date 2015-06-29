@@ -117,6 +117,13 @@ abstract class base
     }
 
     /**
+     * Save changes.
+     */
+    public function save() {
+        static::create($this, true);
+    }
+
+    /**
      * Is this notification visible for the current user?
      */
     public function is_visible($userid = null) {

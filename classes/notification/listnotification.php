@@ -38,11 +38,8 @@ abstract class listnotification extends base
      * Retrieve an item from the list.
      */
     public function get_item($key) {
-        if (!isset($this->other['items'])) {
-            return null;
-        }
-
-        return $this->other['items'][$key];
+        $items = $this->get_items();
+        return isset($items[$key]) ? $items[$key] : null;
     }
 
     /**

@@ -74,7 +74,7 @@ abstract class listnotification extends base
     /**
      * Returns the notification.
      */
-    public final function render() {
+    protected final function get_contents() {
         $items = array();
         foreach ($this->get_items() as $item) {
             $items[] = $this->render_item($item);
@@ -103,17 +103,17 @@ HTML5;
     /**
      * Returns some text (before the items).
      */
-    public abstract function render_text();
+    protected abstract function render_text();
 
     /**
      * Returns a rendered item.
      */
-    public abstract function render_item($item);
+    protected abstract function render_item($item);
 
     /**
      * Checks custom data.
      */
-    public function set_custom_data($data) {
+    protected function set_custom_data($data) {
         if (empty($data['items'])) {
             debugging('You have not set any items.');
         }

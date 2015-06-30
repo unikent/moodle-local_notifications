@@ -264,7 +264,7 @@ abstract class base
     /**
      * Checks custom data.
      */
-    public function set_custom_data($data) {
+    protected function set_custom_data($data) {
         $this->other = (array)$data;
     }
 
@@ -285,6 +285,43 @@ abstract class base
             case self::LEVEL_DANGER:
             return 'fa-times-circle';
         }
+    }
+
+    /**
+     * Performs a full render.
+     */
+    public final function render() {
+        if (!$this->is_visible()) {
+            return '';
+        }
+
+        $message = $this->get_contents();
+        if (empty($message)) {
+            return '';
+        }
+
+        $classes = "alert " . $this->get_level();
+        $dismiss = '';
+        if ($this->is_dismissble()) {
+            $id = $this->get_id();
+            $classes .= ' alert-dismissible';
+            $dismiss .= <<<HTML5
+            <button type="button" class="close cnid-dismiss" data-dismiss="alert" data-id="{$id}" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+HTML5;
+        }
+
+        $icon = \html_writer::tag('i', '', array(
+            'class' => 'fa ' . $this->get_icon()
+        ));
+
+        return <<<HTML5
+        <div class="{$classes}" role="alert">
+            {$dismiss}
+            {$icon} {$message}
+        </div>
+HTML5;
     }
 
     /**
@@ -309,5 +346,5 @@ abstract class base
     /**
      * Returns the notification.
      */
-    public abstract function render();
+    protected abstract function get_contents();
 }

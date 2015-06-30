@@ -52,11 +52,13 @@ abstract class base
     public final static function get($objectid, $context) {
         global $DB;
 
+        $ctx = is_object($context) ? $context->id : $context;
+
         $obj = $DB->get_record('local_notifications', array(
             'classname' => static::class,
             'objectid' => $objectid,
             'objecttable' => static::get_table(),
-            'contextid' => $context->id
+            'contextid' => $ctx
         ));
 
         if (!$obj) {
@@ -78,8 +80,12 @@ abstract class base
             throw new \coding_exception("You must set an objectid.");
         }
 
-        if (!isset($data->context) || !is_object($data->context)) {
+        if (!isset($data->context)) {
             throw new \coding_exception("You must set a context.");
+        }
+
+        if (!is_object($data->context)) {
+            $data->context = \context::instance_by_id($data->context);
         }
 
         $obj = new static();

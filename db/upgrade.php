@@ -140,11 +140,10 @@ function xmldb_local_notifications_upgrade($oldversion) {
             }
 
             // Regenerate the deprecated notification.
-            $task = new \local_kent\task\generate_deprecated_notification();
-            $task->set_custom_data(array(
-                'courseid' => $course->id
+            \local_kent\notification\deprecated::create(array(
+                'objectid' => $course->id,
+                'context' => $context
             ));
-            \core\task\manager::queue_adhoc_task($task);
         }
 
         // Kent savepoint reached.

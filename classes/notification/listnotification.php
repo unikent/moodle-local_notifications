@@ -74,15 +74,36 @@ abstract class listnotification extends base
     /**
      * Returns the notification.
      */
-    public function render() {
+    public final function render() {
         $items = array();
         foreach ($this->get_items() as $item) {
             $items[] = $this->render_item($item);
         }
-        return \html_writer::alist($items, array(
+
+        $items = \html_writer::alist($items, array(
             'class' => 'list'
         ));
+
+        $text = $this->render_text();
+        if (!$text) {
+            return null;
+        }
+
+        return <<<HTML5
+        <a class="alert-link collapsed close" role="button" data-toggle="collapse" href="#notification{$this->id}" aria-expanded="false" aria-controls="notification{$this->id}">
+            <i class="fa fa-chevron-down"></i>
+        </a>
+        $text
+        <div id="notification{$this->id}" class="collapse">
+        $items
+        </div>
+HTML5;
     }
+
+    /**
+     * Returns some text (before the items).
+     */
+    public abstract function render_text();
 
     /**
      * Returns a rendered item.

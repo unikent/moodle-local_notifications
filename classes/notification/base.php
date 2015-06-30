@@ -312,9 +312,14 @@ abstract class base
 HTML5;
         }
 
-        $icon = \html_writer::tag('i', '', array(
-            'class' => 'fa ' . $this->get_icon()
-        ));
+        // Render the icon.
+        $icon = $this->get_icon();
+        if ($icon) {
+            $classes .= ' alert-icon';
+            $icon = \html_writer::tag('i', '', array(
+                'class' => 'fa ' . $icon
+            ));
+        }
 
         return <<<HTML5
         <div class="{$classes}" role="alert">

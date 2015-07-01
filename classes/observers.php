@@ -30,7 +30,7 @@ class observers
         // Delete any notifications.
         $notifications = core::get_notifications($event->objectid);
         foreach ($notifications as $notification) {
-            $notification->delete();
+            $notification->purge();
         }
     }
 }

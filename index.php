@@ -115,8 +115,5 @@ echo \html_writer::table($table);
 $total = $DB->count_records('local_notifications', $notificationparams);
 echo $OUTPUT->paging_bar($total, $params['page'], $params['perpage'], $PAGE->url);
 
-// Add form.
-$form->display();
-
 // Output footer.
 echo $OUTPUT->footer();

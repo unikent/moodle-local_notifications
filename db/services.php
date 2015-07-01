@@ -15,15 +15,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information
+ * Local stuff for Moodle Notifications
  *
  * @package    local_notifications
- * @copyright  2015 University of Kent
+ * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+$services = array(
+    'Notifications service' => array(
+        'functions' => array (
+            'local_notifications_dismiss'
+        ),
+        'requiredcapability' => '',
+        'restrictedusers' => 0,
+        'enabled' => 1
+    )
+);
 
-$plugin->component = 'local_notifications';
-$plugin->version   = 2015070100;
-$plugin->requires  = 2014051200;
+$functions = array(
+    'local_notifications_dismiss' => array(
+        'classname'   => 'local_notifications\external\notification',
+        'methodname'  => 'dismiss',
+        'description' => 'Dismiss a notification.',
+        'type'        => 'write'
+    )
+);

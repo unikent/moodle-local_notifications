@@ -52,11 +52,13 @@ abstract class base
     public final static function get($objectid, $context) {
         global $DB;
 
+        $ctx = is_object($context) ? $context->id : $context;
+
         $obj = $DB->get_record('local_notifications', array(
             'classname' => static::class,
             'objectid' => $objectid,
             'objecttable' => static::get_table(),
-            'contextid' => $context->id
+            'contextid' => $ctx
         ));
 
         if (!$obj) {
@@ -78,8 +80,12 @@ abstract class base
             throw new \coding_exception("You must set an objectid.");
         }
 
-        if (!isset($data->context) || !is_object($data->context)) {
+        if (!isset($data->context)) {
             throw new \coding_exception("You must set a context.");
+        }
+
+        if (!is_object($data->context)) {
+            $data->context = \context::instance_by_id($data->context);
         }
 
         $obj = new static();
@@ -102,7 +108,7 @@ abstract class base
         if ($existing) {
             $existing->data = $record->data;
             $DB->update_record('local_notifications', (array)$existing);
-            return $existing;
+            return static::instance($existing);
         }
 
         // Create a new record.
@@ -114,6 +120,13 @@ abstract class base
         $event->trigger();
 
         return $obj;
+    }
+
+    /**
+     * Save changes.
+     */
+    public function save() {
+        static::create($this, true);
     }
 
     /**
@@ -251,7 +264,7 @@ abstract class base
     /**
      * Checks custom data.
      */
-    public function set_custom_data($data) {
+    protected function set_custom_data($data) {
         $this->other = (array)$data;
     }
 
@@ -272,6 +285,48 @@ abstract class base
             case self::LEVEL_DANGER:
             return 'fa-times-circle';
         }
+    }
+
+    /**
+     * Performs a full render.
+     */
+    public final function render() {
+        if (!$this->is_visible()) {
+            return '';
+        }
+
+        $message = $this->get_contents();
+        if (empty($message)) {
+            return '';
+        }
+
+        $classes = "alert " . $this->get_level();
+        $dismiss = '';
+        if ($this->is_dismissble()) {
+            $id = $this->get_id();
+            $classes .= ' alert-dismissible';
+            $dismiss .= <<<HTML5
+            <button type="button" class="close cnid-dismiss" data-dismiss="alert" data-id="{$id}" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+HTML5;
+        }
+
+        // Render the icon.
+        $icon = $this->get_icon();
+        if ($icon) {
+            $classes .= ' alert-icon';
+            $icon = \html_writer::tag('i', '', array(
+                'class' => 'fa ' . $icon
+            ));
+        }
+
+        return <<<HTML5
+        <div class="{$classes}" role="alert">
+            {$dismiss}
+            {$icon} {$message}
+        </div>
+HTML5;
     }
 
     /**
@@ -296,5 +351,5 @@ abstract class base
     /**
      * Returns the notification.
      */
-    public abstract function render();
+    protected abstract function get_contents();
 }

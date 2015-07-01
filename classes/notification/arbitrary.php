@@ -50,14 +50,14 @@ class arbitrary extends \local_notifications\notification\base {
     /**
      * Returns the notification.
      */
-    public function render() {
+    protected function get_contents() {
         return $this->other['message'];
     }
 
     /**
      * Checks custom data.
      */
-    public function set_custom_data($data) {
+    protected function set_custom_data($data) {
         if (empty($data['actions'])) {
             throw new \moodle_exception('You must set "actions".');
         }

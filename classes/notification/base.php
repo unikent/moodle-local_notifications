@@ -322,7 +322,7 @@ abstract class base
             $classes .= ' alert-dismissible';
             $dismiss .= <<<HTML5
             <button type="button" class="close cnid-dismiss" data-dismiss="alert" data-id="{$id}" aria-label="Close">
-                <i class="fa fa-cross"></i>
+                <i class="fa fa-times"></i>
             </button>
 HTML5;
         }

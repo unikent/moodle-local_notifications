@@ -39,6 +39,23 @@ if ($action == 'delete') {
     redirect($PAGE->url, 'Notification deleted', 2);
 }
 
+// Check the form.
+$form = new \local_notifications\form\arbitrary();
+if ($data = $form->get_data()) {
+    \local_notifications\notification\arbitrary::create(array(
+        'objectid' => $data->courseid,
+        'context' => \context_course::instance($data->courseid),
+        'other' => array(
+            'actions' => $data->actions,
+            'level' => $data->type,
+            'dismissable' => $data->dismissable ? true : false,
+            'message' => $data->message
+        )
+    ));
+
+    redirect($PAGE->url, 'Notification created', 2);
+}
+
 $PAGE->requires->js_call_amd('local_notifications/filtering', 'init', array());
 
 $table = new \html_table();
@@ -87,7 +104,6 @@ foreach ($notifications as $row) {
 }
 
 $notifications->close();
-
 
 // Output header.
 echo $OUTPUT->header();

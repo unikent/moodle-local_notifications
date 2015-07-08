@@ -48,6 +48,13 @@ class arbitrary extends \local_notifications\notification\base {
     }
 
     /**
+     * Is the action dismissable?
+     */
+    public function is_dismissble() {
+        return $this->other['dismissable'];
+    }
+
+    /**
      * Returns the notification.
      */
     protected function get_contents() {
@@ -64,6 +71,10 @@ class arbitrary extends \local_notifications\notification\base {
 
         if (empty($data['level'])) {
             throw new \moodle_exception('You must set "level".');
+        }
+
+        if (empty($data['dismissable'])) {
+            throw new \moodle_exception('You must set "dismissable".');
         }
 
         if (empty($data['message'])) {

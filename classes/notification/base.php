@@ -223,6 +223,21 @@ abstract class base
     }
 
     /**
+     * Purge a notification (Use delete instead).
+     */
+    public function purge() {
+        global $DB;
+
+        if (!isset($this->id)) {
+            throw new \coding_exception("Cannot delete a notification without an ID.");
+        }
+
+        $DB->delete_records('local_notifications', array(
+            'id' => $this->id
+        ));
+    }
+
+    /**
      * Mark this as seen.
      */
     public function mark_seen($userid = null) {

@@ -63,6 +63,8 @@ class arbitrary extends \local_notifications\notification\base {
 
     /**
      * Checks custom data.
+     * @param $data
+     * @throws \moodle_exception
      */
     protected function set_custom_data($data) {
         if (empty($data['actions'])) {

@@ -25,6 +25,9 @@ class core
 {
     /**
      * Returns the notifications for a course.
+     * @param $notification
+     * @return null
+     * @throws \coding_exception
      */
     public static function get_notification($notification) {
         global $DB;
@@ -48,6 +51,8 @@ class core
 
     /**
      * Returns the notifications for a course.
+     * @param $courseid
+     * @return array
      */
     public static function get_notifications($courseid) {
         global $DB;
@@ -73,6 +78,8 @@ class core
 
     /**
      * Returns the notification count for a course.
+     * @param $courseid
+     * @return int
      */
     public static function count_notifications($courseid) {
         global $DB;
@@ -88,6 +95,8 @@ class core
 
     /**
      * Returns the action count for a course.
+     * @param $courseid
+     * @return int
      */
     public static function count_actions($courseid) {
         $notifications = static::get_notifications($courseid);

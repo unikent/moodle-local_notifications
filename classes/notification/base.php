@@ -35,6 +35,8 @@ abstract class base
 
     /**
      * Creates an instance of the notification.
+     * @param $data
+     * @return static
      */
     public final static function instance($data) {
         $obj = new static();
@@ -48,6 +50,10 @@ abstract class base
 
     /**
      * Get a copy of this notification.
+     * @param $objectid
+     * @param $context
+     * @return base|null
+     * @throws \coding_exception
      */
     public final static function get($objectid, $context) {
         global $DB;
@@ -70,6 +76,10 @@ abstract class base
 
     /**
      * Save the notification to DB.
+     * @param $data
+     * @param bool $update
+     * @return base|static
+     * @throws \coding_exception
      */
     public final static function create($data, $update = true) {
         global $DB;
@@ -105,9 +115,9 @@ abstract class base
         $record->data = serialize($obj->other);
 
         // Update existing record.
-        if ($existing) {
+        if ($existing && $update) {
             $existing->data = $record->data;
-            $DB->update_record('local_notifications', (array)$existing);
+            $DB->update_record('local_notifications', $existing);
             return static::instance($existing);
         }
 
@@ -131,6 +141,8 @@ abstract class base
 
     /**
      * Is this notification visible for the current user?
+     * @param null $userid
+     * @return bool
      */
     public function is_visible($userid = null) {
         global $DB, $USER;
@@ -213,7 +225,7 @@ abstract class base
             throw new \coding_exception("Cannot delete a notification without an ID.");
         }
 
-        $DB->update_record('local_notifications', array(
+        $DB->update_record('local_notifications', (object)array(
             'id' => $this->id,
             'deleted' => 1
         ));
@@ -239,6 +251,8 @@ abstract class base
 
     /**
      * Mark this as seen.
+     * @param null $userid
+     * @throws \coding_exception
      */
     public function mark_seen($userid = null) {
         global $DB, $USER;
@@ -278,6 +292,7 @@ abstract class base
 
     /**
      * Checks custom data.
+     * @param $data
      */
     protected function set_custom_data($data) {
         $this->other = (array)$data;
@@ -300,6 +315,8 @@ abstract class base
             case self::LEVEL_DANGER:
             return 'fa-times-circle';
         }
+
+        return 'fa-question';
     }
 
     /**

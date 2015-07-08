@@ -25,6 +25,7 @@ class observers
 {
     /**
      * Clears notifications.
+     * @param \core\event\base $event
      */
     public static function clear_notifications(\core\event\base $event) {
         // Delete any notifications.

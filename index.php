@@ -112,7 +112,7 @@ foreach ($notifications as $row) {
                         <h4 class="modal-title" id="datamodallabel{$row->id}">Notification Data</h4>
                     </div>
                     <div class="modal-body">
-                        <code class="highlight language-json">{$data}</code>
+                        <code class="language-json">{$data}</code>
                     </div>
                 </div>
             </div>

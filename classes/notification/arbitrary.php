@@ -37,6 +37,10 @@ class arbitrary extends \local_notifications\notification\base {
      * Returns the number of "actions" of the notification.
      */
     public function get_actions() {
+        if (empty($this->other['actions'])) {
+            return 0;
+        }
+
         return $this->other['actions'];
     }
 
@@ -67,10 +71,6 @@ class arbitrary extends \local_notifications\notification\base {
      * @throws \moodle_exception
      */
     protected function set_custom_data($data) {
-        if (empty($data['actions'])) {
-            throw new \moodle_exception('You must set "actions".');
-        }
-
         if (empty($data['level'])) {
             throw new \moodle_exception('You must set "level".');
         }

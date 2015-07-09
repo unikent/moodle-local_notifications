@@ -79,27 +79,51 @@ if (!empty($params['objectid'])) {
 $courses = $DB->get_records('course', null, 'shortname');
 $notifications = $DB->get_recordset('local_notifications', $notificationparams, '', '*', $params['page'] * $params['perpage'], $params['perpage']);
 foreach ($notifications as $row) {
-    $course = new \html_table_cell(\html_writer::tag('a', $courses[$row->objectid]->shortname, array(
+    $course = \html_writer::tag('a', $courses[$row->objectid]->shortname, array(
         'href' => new \moodle_url('/course/view.php', array(
             'id' => $row->objectid
         )),
         'target' => '_blank'
-    )));
+    ));
 
     $actionurl = new \moodle_url('/local/notifications/index.php', array_merge($params, array(
         'sesskey' => sesskey(),
         'action' => 'delete',
         'id' => $row->id
     )));
-    $action = new \html_table_cell(\html_writer::tag('a', 'Delete', array(
-        'href' => $actionurl
-    )));
+    $action = \html_writer::tag('button', 'Delete', array(
+        'href' => $actionurl,
+        'class' => 'btn btn-danger btn-sm'
+    ));
+
+    $data = json_encode(unserialize($row->data), JSON_PRETTY_PRINT);
+
+    $databutton = \html_writer::tag('button', 'View data', array(
+        'class' => 'btn btn-primary btn-sm',
+        'data-toggle' => 'modal',
+        'data-target' => "#datamodal{$row->id}"
+    ));
+    $databutton .= <<<HTML5
+        <div class="modal fade" id="datamodal{$row->id}" tabindex="-1" role="dialog" aria-labelledby="datamodallabel{$row->id}">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="datamodallabel{$row->id}">Notification Data</h4>
+                    </div>
+                    <div class="modal-body">
+                        <pre>{$data}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+HTML5;
 
     $table->data[] = array(
-        $course,
+        new \html_table_cell($course),
         $row->classname,
-        $row->data,
-        $action
+        new \html_table_cell(empty($data) || $data == 'null' ? '' : $databutton),
+        new \html_table_cell($action)
     );
 }
 
@@ -126,7 +150,7 @@ echo \html_writer::select($prettycourses, 'course', $params['objectid'], array('
 echo '<br />';
 
 // Display notifications table.
-echo \html_writer::table($table);
+echo \html_writer::div(\html_writer::table($table), 'no-overflow');
 
 $total = $DB->count_records('local_notifications', $notificationparams);
 echo $OUTPUT->paging_bar($total, $params['page'], $params['perpage'], $PAGE->url);

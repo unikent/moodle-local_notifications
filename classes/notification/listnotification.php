@@ -108,7 +108,7 @@ abstract class listnotification extends base
             <i class="fa fa-chevron-down"></i>
         </a>
         {$text}
-        <div id="notification{$this->id}" class="collapse">
+        <div id="notification{$this->id}" class="collapse alert-dropdown-container">
         {$items}
         </div>
 HTML5;

@@ -58,8 +58,11 @@ class arbitrary extends \moodleform
 
         $this->add_action_buttons(true);
     }
+
     /**
      * Set default.
+     * @param $field
+     * @param int $val
      */
     public function set_field_default($field, $val = 0) {
         $mform =& $this->_form;

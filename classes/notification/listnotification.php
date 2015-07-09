@@ -24,7 +24,17 @@ defined('MOODLE_INTERNAL') || die();
 abstract class listnotification extends base
 {
     /**
+     * For now, we don't support dismissable list notifications.
+     * A list implies an action anyway - so this kinda makes sense.
+     */
+    public final function is_dismissble() {
+        return false;
+    }
+
+    /**
      * Add an item to the list.
+     * @param $key
+     * @param $data
      */
     public function add_item($key, $data) {
         if (!isset($this->other['items'])) {
@@ -36,6 +46,8 @@ abstract class listnotification extends base
 
     /**
      * Retrieve an item from the list.
+     * @param $key
+     * @return null
      */
     public function get_item($key) {
         $items = $this->get_items();
@@ -55,13 +67,15 @@ abstract class listnotification extends base
 
     /**
      * Remove a given item.
+     * @param $key
+     * @throws \moodle_exception
      */
     public function remove_item($key) {
-        if (!$this->get_item($k)) {
+        if (!$this->get_item($key)) {
             throw new \moodle_exception("Invalid list notification item key.");
         }
 
-        unset($this->other['items'][$k]);
+        unset($this->other['items'][$key]);
     }
 
     /**
@@ -90,12 +104,12 @@ abstract class listnotification extends base
         }
 
         return <<<HTML5
-        <a class="alert-link collapsed close" role="button" data-toggle="collapse" href="#notification{$this->id}" aria-expanded="false" aria-controls="notification{$this->id}">
+        <a class="alert-link alert-dropdown collapsed close" role="button" data-toggle="collapse" href="#notification{$this->id}" aria-expanded="false" aria-controls="notification{$this->id}">
             <i class="fa fa-chevron-down"></i>
         </a>
-        $text
+        {$text}
         <div id="notification{$this->id}" class="collapse">
-        $items
+        {$items}
         </div>
 HTML5;
     }
@@ -107,11 +121,14 @@ HTML5;
 
     /**
      * Returns a rendered item.
+     * @param $item
+     * @return
      */
     protected abstract function render_item($item);
 
     /**
      * Checks custom data.
+     * @param $data
      */
     protected function set_custom_data($data) {
         if (empty($data['items'])) {

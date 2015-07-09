@@ -24,6 +24,14 @@ defined('MOODLE_INTERNAL') || die();
 abstract class listnotification extends base
 {
     /**
+     * For now, we don't support dismissable list notifications.
+     * A list implies an action anyway - so this kinda makes sense.
+     */
+    public final function is_dismissble() {
+        return false;
+    }
+
+    /**
      * Add an item to the list.
      * @param $key
      * @param $data

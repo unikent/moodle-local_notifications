@@ -96,12 +96,12 @@ abstract class listnotification extends base
         }
 
         return <<<HTML5
-        <a class="alert-link collapsed close" role="button" data-toggle="collapse" href="#notification{$this->id}" aria-expanded="false" aria-controls="notification{$this->id}">
+        <a class="alert-link alert-dropdown collapsed close" role="button" data-toggle="collapse" href="#notification{$this->id}" aria-expanded="false" aria-controls="notification{$this->id}">
             <i class="fa fa-chevron-down"></i>
         </a>
-        $text
+        {$text}
         <div id="notification{$this->id}" class="collapse">
-        $items
+        {$items}
         </div>
 HTML5;
     }

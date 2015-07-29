@@ -47,8 +47,7 @@ class notification extends external_api
             'id' => new external_value(
                 PARAM_INT,
                 'The notification id',
-                VALUE_DEFAULT,
-                ''
+                VALUE_REQUIRED
             )
         ));
     }

@@ -116,6 +116,7 @@ abstract class base
 
         // Update existing record.
         if ($existing && $update) {
+            $existing->deleted = '0';
             $existing->data = $record->data;
             $DB->update_record('local_notifications', $existing);
             return static::instance($existing);

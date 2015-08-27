@@ -104,23 +104,6 @@ function xmldb_local_notifications_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015062501, 'local', 'notifications');
     }
 
-    if ($oldversion < 2015062502) {
-        $expirations = $DB->get_records('tool_cat_recyclebin', array('status' => 0));
-        foreach ($expirations as $expiration) {
-            $context = \context_course::instance($expiration->courseid);
-
-            \tool_cat\notification\recyclebin::create(array(
-                'objectid' => $expiration->courseid,
-                'context' => $context,
-                'other' => array(
-                    'expirationtime' => $expiration->expiration_time
-                )
-            ));
-        }
-
-        upgrade_plugin_savepoint(true, 2015062502, 'local', 'notifications');
-    }
-
     // Upgrade notifications.
     if ($oldversion < 2015062503) {
         $contextpreload = \context_helper::get_preload_record_columns_sql('x');

@@ -53,14 +53,6 @@ class notification extends external_api
     }
 
     /**
-     * Expose to AJAX
-     * @return boolean
-     */
-    public static function dismiss_is_allowed_from_ajax() {
-        return true;
-    }
-
-    /**
      * Dismiss a notification.
      *
      * @param string $id The notification id.

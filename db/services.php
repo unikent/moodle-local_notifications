@@ -38,6 +38,7 @@ $functions = array(
         'classname'   => 'local_notifications\external\notification',
         'methodname'  => 'dismiss',
         'description' => 'Dismiss a notification.',
-        'type'        => 'write'
+        'type'        => 'write',
+        'ajax'        => true
     )
 );

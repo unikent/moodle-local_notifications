@@ -15,7 +15,7 @@
 
 /*
  * @package    local_notification
- * @copyright  2015 Skylar Kelty <S.Kelty@kent.ac.uk>
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -25,10 +25,10 @@
 define(['core/url'], function(url) {
     return {
         init: function() {
-            $('#menuextref, #menucourse').on('change', function(e) {
-                var extref = $('#menuextref').val();
+            $('#menuclassname, #menucourse').on('change', function(e) {
+                var classname = $('#menuclassname').val();
                 var courseid = $('#menucourse').val();
-                window.location = url.relativeUrl('/local/notifications/index.php') + '?extref=' + extref + '&courseid=' + courseid
+                window.location = url.relativeUrl('/local/notifications/index.php') + '?classname=' + classname + '&courseid=' + courseid
             });
         }
     };

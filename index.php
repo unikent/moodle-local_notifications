@@ -65,7 +65,8 @@ $table->head = array(
 $table->data = array();
 
 $notificationparams = array(
-    'objecttable' => 'course'
+    'objecttable' => 'course',
+    'deleted' => 0
 );
 
 if (!empty($params['classname'])) {

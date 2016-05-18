@@ -162,5 +162,25 @@ function xmldb_local_notifications_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2015062504, 'local', 'notifications');
     }
 
+    if ($oldversion < 2016051800) {
+        // Add new manual notifications.
+        $courses = $DB->get_records('course');
+        foreach ($courses as $course) {
+            $context = \context_course::instance($course->id);
+            $kentcourse = new \local_kent\Course($course);
+            if (!$kentcourse->is_manual()) {
+                continue;
+            }
+
+            // Add a manual notification.
+            \local_notifications\notification\manualguest::create(array(
+                'objectid' => $course->id,
+                'context' => $context
+            ));
+        }
+
+        upgrade_plugin_savepoint(true, 2016051800, 'local', 'notifications');
+    }
+
     return true;
 }

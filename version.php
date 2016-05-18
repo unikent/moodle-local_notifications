@@ -18,12 +18,12 @@
  * Version information
  *
  * @package    local_notifications
- * @copyright  2015 University of Kent
+ * @copyright  2016 Skylar Kelty <S.Kelty@kent.ac.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_notifications';
-$plugin->version   = 2015121200;
+$plugin->version   = 2016051800;
 $plugin->requires  = 2015111600;

@@ -51,7 +51,7 @@ class manualguest extends base {
      * Returns the notification.
      */
     protected function get_contents() {
-        global $DB;
+        global $DB, $PAGE;
 
         // Is guest access enabled?
         $instance = $DB->get_record('enrol', array(
@@ -63,10 +63,25 @@ class manualguest extends base {
             return;
         }
 
-        $url = new \moodle_url('/enrol/instances.php', array(
+        $plugins = enrol_get_plugins(false);
+        $plugin = $plugins[$instance->enrol];
+        if (!$plugin->can_hide_show_instance($instance)) {
+            return;
+        }
+
+        $disable = optional_param('disableguest', false, PARAM_BOOL);
+        if ($disable) {
+            require_sesskey();
+
+            if ($instance->status != ENROL_INSTANCE_DISABLED) {
+                $plugin->update_status($instance, ENROL_INSTANCE_DISABLED);
+                return;
+            }
+        }
+
+        $url = new \moodle_url($PAGE->url, array(
             'sesskey' => sesskey(),
-            'id' => $this->objectid,
-            'action' => 'disable',
+            'disableguest' => '1',
             'instance' => $instance->id
         ));
         $link = \html_writer::link($url, 'Disable guest access.', array('class' => 'alert-link'));

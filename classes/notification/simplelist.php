@@ -19,9 +19,9 @@ namespace local_notifications\notification;
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Base notification.
+ * Simple list notification.
  */
-abstract class listnotification extends base
+abstract class simplelist extends base
 {
     /**
      * For now, we don't support dismissable list notifications.
@@ -89,29 +89,37 @@ abstract class listnotification extends base
      * Returns the notification.
      */
     protected final function get_contents() {
+        // Setup chevron.
+        $chevron = \html_writer::link("#notification{$this->id}", '<i class="fa fa-chevron-down"></i>', array(
+            'class' => 'alert-link alert-dropdown collapsed close',
+            'data-toggle' => 'collapse',
+            'aria-expanded' => 'false',
+            'aria-controls' => "notification{$this->id}"
+        ));
+
+        // Process items.
         $items = array();
         foreach ($this->get_items() as $item) {
             $items[] = $this->render_item($item);
         }
 
-        $items = \html_writer::alist($items, array(
-            'class' => 'list'
-        ));
+        if (!empty($items)) {
+            $items = \html_writer::alist($items, array(
+                'class' => 'list'
+            ));
+
+            $items = \html_writer::div($items, 'collapse alert-dropdown-container', array('id' => "notification{$this->id}"));
+        } else {
+            $items = '';
+            $chevron = '';
+        }
 
         $text = $this->render_text();
         if (!$text) {
             return null;
         }
 
-        return <<<HTML5
-        <a class="alert-link alert-dropdown collapsed close" role="button" data-toggle="collapse" href="#notification{$this->id}" aria-expanded="false" aria-controls="notification{$this->id}">
-            <i class="fa fa-chevron-down"></i>
-        </a>
-        {$text}
-        <div id="notification{$this->id}" class="collapse alert-dropdown-container">
-        {$items}
-        </div>
-HTML5;
+        return $chevron . $text . $items;
     }
 
     /**

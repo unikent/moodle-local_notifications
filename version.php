@@ -25,5 +25,5 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_notifications';
-$plugin->version   = 2016051800;
+$plugin->version   = 2016070100;
 $plugin->requires  = 2015111600;

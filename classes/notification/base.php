@@ -321,6 +321,24 @@ abstract class base
     }
 
     /**
+     * Returns any action buttons associated with this notification.
+     */
+    protected function get_action_icons() {
+        $actions = '';
+
+        if ($this->is_dismissble()) {
+            $id = $this->get_id();
+            $actions .= <<<HTML5
+            <button type="button" class="close cnid-dismiss" data-dismiss="alert" data-id="{$id}" aria-label="Close">
+                <i class="fa fa-times" aria-hidden="true"></i>
+            </button>
+HTML5;
+        }
+
+        return $actions;
+    }
+
+    /**
      * Performs a full render.
      */
     public final function render() {
@@ -334,16 +352,12 @@ abstract class base
         }
 
         $classes = "alert " . $this->get_level();
-        $dismiss = '';
         if ($this->is_dismissble()) {
-            $id = $this->get_id();
             $classes .= ' alert-dismissible';
-            $dismiss .= <<<HTML5
-            <button type="button" class="close cnid-dismiss" data-dismiss="alert" data-id="{$id}" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-HTML5;
         }
+
+        // Grab any other actions.
+        $actions = \html_writer::div($this->get_action_icons(), 'action-icons');
 
         // Render the icon.
         $icon = $this->get_icon();
@@ -356,7 +370,7 @@ HTML5;
 
         return <<<HTML5
         <div class="{$classes}" role="alert">
-            {$dismiss}
+            {$actions}
             {$icon} {$message}
         </div>
 HTML5;

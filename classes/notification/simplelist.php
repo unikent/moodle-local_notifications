@@ -24,10 +24,9 @@ defined('MOODLE_INTERNAL') || die();
 abstract class simplelist extends base
 {
     /**
-     * For now, we don't support dismissable list notifications.
-     * A list implies an action anyway - so this kinda makes sense.
+     * Default to false for lists.
      */
-    public final function is_dismissble() {
+    public function is_dismissble() {
         return false;
     }
 
@@ -66,6 +65,19 @@ abstract class simplelist extends base
     }
 
     /**
+     * Cached get_items.
+     * Internal use only.
+     */
+    private function _get_items() {
+        static $items = null;
+        if (!$items) {
+            $items = $this->get_items();
+        }
+
+        return $items;
+    }
+
+    /**
      * Remove a given item.
      * @param $key
      * @throws \moodle_exception
@@ -82,24 +94,36 @@ abstract class simplelist extends base
      * Returns the number of "actions" of the notification.
      */
     public function get_actions() {
-        return count($this->get_items());
+        return count($this->_get_items());
     }
 
     /**
-     * Returns the notification.
+     * Returns any action buttons associated with this notification.
      */
-    protected final function get_contents() {
-        // Setup chevron.
-        $chevron = \html_writer::link("#notification{$this->id}", '<i class="fa fa-chevron-down"></i>', array(
+    protected function get_action_icons() {
+        $icons = parent::get_action_icons();
+        if (empty($this->_get_items())) {
+            return $icons;
+        }
+
+        $icon = '<i class="fa fa-chevron-down" aria-hidden="true"></i>';
+        $icons .= \html_writer::link("#notification{$this->id}", $icon, array(
             'class' => 'alert-link alert-dropdown collapsed close',
             'data-toggle' => 'collapse',
             'aria-expanded' => 'false',
             'aria-controls' => "notification{$this->id}"
         ));
 
+        return $icons;
+    }
+
+    /**
+     * Returns the notification.
+     */
+    protected final function get_contents() {
         // Process items.
         $items = array();
-        foreach ($this->get_items() as $item) {
+        foreach ($this->_get_items() as $item) {
             $items[] = $this->render_item($item);
         }
 
@@ -111,7 +135,6 @@ abstract class simplelist extends base
             $items = \html_writer::div($items, 'collapse alert-dropdown-container', array('id' => "notification{$this->id}"));
         } else {
             $items = '';
-            $chevron = '';
         }
 
         $text = $this->render_text();
@@ -119,7 +142,7 @@ abstract class simplelist extends base
             return null;
         }
 
-        return $chevron . $text . $items;
+        return $text . $items;
     }
 
     /**

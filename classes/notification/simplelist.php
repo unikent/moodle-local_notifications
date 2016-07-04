@@ -31,6 +31,13 @@ abstract class simplelist extends base
     }
 
     /**
+     * Default to false for lists.
+     */
+    public function is_expanded() {
+        return false;
+    }
+
+    /**
      * Add an item to the list.
      * @param $key
      * @param $data
@@ -49,7 +56,7 @@ abstract class simplelist extends base
      * @return null
      */
     public function get_item($key) {
-        $items = $this->get_items();
+        $items = $this->_get_items();
         return isset($items[$key]) ? $items[$key] : null;
     }
 
@@ -108,9 +115,9 @@ abstract class simplelist extends base
 
         $icon = '<i class="fa fa-chevron-down" aria-hidden="true"></i>';
         $icons .= \html_writer::link("#notification{$this->id}", $icon, array(
-            'class' => 'alert-link alert-dropdown collapsed close',
+            'class' => 'alert-link alert-dropdown close' . ($this->is_expanded() ? '' : ' collapsed'),
             'data-toggle' => 'collapse',
-            'aria-expanded' => 'false',
+            'aria-expanded' => $this->is_expanded() ? 'true' : 'false',
             'aria-controls' => "notification{$this->id}"
         ));
 
@@ -132,7 +139,10 @@ abstract class simplelist extends base
                 'class' => 'list'
             ));
 
-            $items = \html_writer::div($items, 'collapse alert-dropdown-container', array('id' => "notification{$this->id}"));
+            $classes = 'collapse alert-dropdown-container' . ($this->is_expanded() ? ' in' : '');
+            $items = \html_writer::div($items, $classes, array(
+                'id' => "notification{$this->id}"
+            ));
         } else {
             $items = '';
         }

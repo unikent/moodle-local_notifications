@@ -33,8 +33,15 @@ abstract class simplelist extends base
     /**
      * Default to false for lists.
      */
-    public function is_expanded() {
+    public function is_expanded_default() {
         return false;
+    }
+
+    /**
+     * Default to false for lists.
+     */
+    public function is_expanded() {
+        return $this->is_expanded_default();
     }
 
     /**

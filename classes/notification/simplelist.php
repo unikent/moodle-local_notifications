@@ -41,6 +41,16 @@ abstract class simplelist extends base
      * Default to false for lists.
      */
     public function is_expanded() {
+        global $USER;
+
+        if (isloggedin()) {
+            check_user_preferences_loaded($USER);
+            $key = "notification_{$this->id}_expanded";
+            if (isset($USER->preference[$key])) {
+                return (bool)$USER->preference[$key];
+            }
+        }
+
         return $this->is_expanded_default();
     }
 
@@ -122,8 +132,9 @@ abstract class simplelist extends base
 
         $icon = '<i class="fa fa-chevron-down" aria-hidden="true"></i>';
         $icons .= \html_writer::link("#notification{$this->id}", $icon, array(
-            'class' => 'alert-link alert-dropdown close' . ($this->is_expanded() ? '' : ' collapsed'),
+            'class' => 'alert-link alert-dropdown close cnid-expand' . ($this->is_expanded() ? '' : ' collapsed'),
             'data-toggle' => 'collapse',
+            'data-id' => $this->id,
             'aria-expanded' => $this->is_expanded() ? 'true' : 'false',
             'aria-controls' => "notification{$this->id}"
         ));

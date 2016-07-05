@@ -75,4 +75,55 @@ class notification extends external_api
     public static function dismiss_returns() {
         return null;
     }
+
+    /**
+     * Returns description of method parameters
+     * @return external_function_parameters
+     */
+    public static function expanded_toggle_parameters() {
+        return new external_function_parameters(array(
+            'id' => new external_value(
+                PARAM_INT,
+                'The notification id',
+                VALUE_REQUIRED
+            ),
+            'value' => new external_value(
+                PARAM_BOOL,
+                'The notification expansion value',
+                VALUE_REQUIRED
+            )
+        ));
+    }
+
+    /**
+     * Toggle expansion of a notification.
+     *
+     * @param string $id The notification id.
+     * @param string $value The notification expansion value.
+     * @return array[string]
+     */
+    public static function expanded_toggle($id, $value) {
+        global $USER;
+
+        $params = self::validate_parameters(self::expanded_toggle_parameters(), array(
+            'id' => $id,
+            'value' => $value,
+        ));
+
+        if (isloggedin()) {
+            $id = $params['id'];
+            check_user_preferences_loaded($USER);
+            $key = "notification_{$id}_expanded";
+            set_user_preference($key, $params['value']);
+        }
+    }
+
+    /**
+     * Returns nothing.
+     *
+     * @return external_description
+     */
+    public static function expanded_toggle_returns() {
+        return null;
+    }
 }

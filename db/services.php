@@ -25,7 +25,8 @@
 $services = array(
     'Notifications service' => array(
         'functions' => array (
-            'local_notifications_dismiss'
+            'local_notifications_dismiss',
+            'local_notifications_expanded_toggle'
         ),
         'requiredcapability' => '',
         'restrictedusers' => 0,
@@ -38,6 +39,13 @@ $functions = array(
         'classname'   => 'local_notifications\external\notification',
         'methodname'  => 'dismiss',
         'description' => 'Dismiss a notification.',
+        'type'        => 'write',
+        'ajax'        => true
+    ),
+    'local_notifications_expanded_toggle' => array(
+        'classname'   => 'local_notifications\external\notification',
+        'methodname'  => 'expanded_toggle',
+        'description' => 'Toggle expansion of a notification.',
         'type'        => 'write',
         'ajax'        => true
     )

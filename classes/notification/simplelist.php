@@ -93,12 +93,12 @@ abstract class simplelist extends base
      * Internal use only.
      */
     private function _get_items() {
-        static $items = null;
-        if (!$items) {
-            $items = $this->get_items();
+        static $items = array();
+        if (!isset($items[$this->id])) {
+            $items[$this->id] = $this->get_items();
         }
 
-        return $items;
+        return $items[$this->id];
     }
 
     /**

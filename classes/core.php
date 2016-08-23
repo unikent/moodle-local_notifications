@@ -51,10 +51,12 @@ class core
 
     /**
      * Returns the notifications for a course.
+     * If $userid is set, only return active notifications for that user.
+     *
      * @param $courseid
      * @return array
      */
-    public static function get_notifications($courseid) {
+    public static function get_notifications($courseid, $userid = null) {
         global $DB;
 
         $courseid = is_object($courseid) ? $courseid->id : $courseid;
@@ -68,7 +70,7 @@ class core
         $notifications = array();
         foreach ($records as $record) {
             $notification = static::get_notification($record);
-            if ($notification) {
+            if ($notification && (!$userid || $notification->is_visible($userid))) {
                 $notifications[] = $notification;
             }
         }
@@ -78,6 +80,7 @@ class core
 
     /**
      * Returns the notification count for a course.
+     *
      * @param $courseid
      * @return int
      */
@@ -95,11 +98,13 @@ class core
 
     /**
      * Returns the action count for a course.
+     * If $userid is set, only count active notifications for that user.
+     *
      * @param $courseid
      * @return int
      */
-    public static function count_actions($courseid) {
-        $notifications = static::get_notifications($courseid);
+    public static function count_actions($courseid, $userid = null) {
+        $notifications = static::get_notifications($courseid, $userid);
 
         $total = 0;
         foreach ($notifications as $notification) {
